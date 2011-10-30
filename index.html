@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head>
+    <script type="text/javascript" src="swfobject.js"></script>
+    <script type="text/javascript" src="sound.js"></script>
+    <script type="text/javascript" src="beep.js"></script>
+    <script type="text/javascript" src="microphone.js"></script>
+    <script type="text/javascript" src="sockjs-0.1.min.js"></script>
+    <script type="text/javascript">
+        Sound.debug = true;
+        Sound.initialize();
+        var s = new Sound();
+        s.load("testsound.mp3");
+        s.play();
+        //s.destroy();
+
+        Microphone.debug = true;
+        Microphone.initialize();
+
+        var reader = new FileReader();
+        reader.onprogress = function(evt) {
+            console.log("Loaded: " + (evt.loaded / evt.total).toString());
+        }
+        reader.onload = function(evt) {
+            console.log("Load complete.");
+        }
+        reader.onerror = function(e) {
+            console.error(e);
+        }
+        var chooser = document.getElementById('chooser');
+
+        function broadcast() {
+            bsock = new SockJS("/broadcast");
+            data = convertFloats(new Beep(44100).generate(500));
+        }
+        function listen() {
+            lsock = new SockJS("/music");
+            sound = new Sound();
+            sound.play();
+            lsock.onmessage = function(m) { sound.buffer(m.data); }
+        }
+    </script>
+</head><body>
+<input id="chooser" type="file"/>
+<div id="testno"></div>
+</body></html>
