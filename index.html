@@ -2,7 +2,6 @@
 <html><head>
     <script type="text/javascript" src="swfobject.js"></script>
     <script type="text/javascript" src="sound.js"></script>
-    <script type="text/javascript" src="beep.js"></script>
     <script type="text/javascript" src="microphone.js"></script>
     <script type="text/javascript" src="sockjs-0.1.min.js"></script>
     <script type="text/javascript">
@@ -13,6 +12,14 @@
         s.play();
         //s.destroy();
 
+        var convertFloats = function(floats) {
+          var bytes = [];
+          for (var i = 0; i < floats.length; i++) {
+            bytes.push(String.fromCharCode((1 + floats[i]) * 27647));
+          }
+          return bytes.join("");
+        }
+        
         Microphone.debug = true;
         Microphone.initialize();
 
@@ -30,7 +37,12 @@
 
         function broadcast() {
             bsock = new SockJS("/broadcast");
-            data = convertFloats(new Beep(44100).generate(500));
+            Microphone.onready(function() {
+                    Microphone.enable();
+                    Microphone.ondata(function(data) {
+                        bsock.send(data); // Typically 2048 bytes.
+                    });
+                });
         }
         function listen() {
             lsock = new SockJS("/music");

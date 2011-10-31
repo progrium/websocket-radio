@@ -1,0 +1,2 @@
+git+git://github.com/progrium/WebSocket-for-Python.git#egg=ws4py-dev
+git+git://github.com/progrium/stomp4py.git#egg=stomp4py-dev
